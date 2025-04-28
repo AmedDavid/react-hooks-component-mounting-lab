@@ -6,7 +6,7 @@ class App extends Component {
     timerIDs: []
   };
 
-  // Add componentDidMount to invoke handleAddTimer
+  // Add componentDidMount to call handleAddTimer when the component mounts
   componentDidMount() {
     this.handleAddTimer();
   }
@@ -41,3 +41,4 @@ class App extends Component {
 }
 
 export default App;
+
