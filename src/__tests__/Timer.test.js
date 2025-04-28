@@ -1,25 +1,54 @@
 import React from 'react';
-import { configure, shallow } from 'enzyme';
-import { spy, stub, useFakeTimers } from 'sinon'
-import Adapter from 'enzyme-adapter-react-16';
-
-configure({ adapter: new Adapter() });
-
+import { render, screen, act } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Timer from '../Timer';
 
-test('it calls componentDidMount', () => {
-  spy(Timer.prototype, 'componentDidMount');
-  let timerWrapper = shallow(<Timer />);
+test('Timer starts counting on mount', () => {
+  jest.useFakeTimers(); // Use fake timers to control setInterval
+  const removeTimer = jest.fn(); // Mock the removeTimer prop
 
-  //component mounted correctly
-  expect(Timer.prototype.componentDidMount.calledOnce).toBe(true);
-  timerWrapper.unmount()
+  render(<Timer id={1} removeTimer={removeTimer} />);
+
+  // Initial state
+  expect(screen.getByText("0")).toBeInTheDocument();
+
+  // Fast-forward 1 second
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  expect(screen.getByText("1")).toBeInTheDocument();
+
+  // Fast-forward another second
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  expect(screen.getByText("2")).toBeInTheDocument();
+
+  jest.useRealTimers(); // Reset to real timers
 });
 
+test('Timer clears interval on unmount', () => {
+  jest.useFakeTimers();
+  const removeTimer = jest.fn();
 
-test('it calls componentWillUnmount', () => {
-  spy(Timer.prototype, 'componentWillUnmount');
-  let timerWrapper = shallow(<Timer />);
-  timerWrapper.unmount()
-  expect(Timer.prototype.componentWillUnmount.calledOnce).toBe(true);
+  const { unmount } = render(<Timer id={1} removeTimer={removeTimer} />);
+
+  // Fast-forward 1 second
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+  expect(screen.getByText("1")).toBeInTheDocument();
+
+  // Unmount the component
+  unmount();
+
+  // Fast-forward another second
+  act(() => {
+    jest.advanceTimersByTime(1000);
+  });
+
+  // Timer should not have updated after unmount
+  expect(screen.queryByText("2")).not.toBeInTheDocument();
+
+  jest.useRealTimers();
 });

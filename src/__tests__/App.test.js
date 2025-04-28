@@ -1,24 +1,17 @@
 import React from 'react';
-import { configure, shallow } from 'enzyme';
-import { spy, stub, useFakeTimers } from 'sinon'
-import Adapter from 'enzyme-adapter-react-16';
-
-configure({ adapter: new Adapter() });
-
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import App from '../App';
 
-test("<App /> calls componentDidMount and adds a Timer", () => {
-  spy(App.prototype, 'componentDidMount');
-  let appWrapper = shallow(<App />);
-
-  expect(App.prototype.componentDidMount.calledOnce).toBe(true);
-
-  expect(appWrapper.children('.TimerGrid').length).toBe(1)
-
-  expect(appWrapper.state().timerIDs.length).toBe(1)
-
-  appWrapper.unmount()
-})
+test("App renders a timer on mount", () => {
+  render(<App />);
+  
+  // Check that a timer is rendered (look for the "Mounted" text from Timer component)
+  expect(screen.getByText(/Mounted/i)).toBeInTheDocument();
+  
+  // Optionally, check for the timer count (initially 0)
+  expect(screen.getByText("0")).toBeInTheDocument();
+});
 
 // describe('<App />', () => {
 //   var appWrapper

@@ -6,12 +6,10 @@ class Timer extends Component {
     color: "#" + Math.floor(Math.random() * 16777215).toString(16)
   };
 
-  // Start the interval when the component mounts
   componentDidMount() {
     this.interval = setInterval(this.clockTick, 1000);
   }
 
-  // Clear the interval when the component unmounts
   componentWillUnmount() {
     clearInterval(this.interval);
   }
